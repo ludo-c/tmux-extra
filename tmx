@@ -41,13 +41,13 @@ else
         done
 
         # Get the full name of the base session, up to the colon
-        base_session_full=$(trim `tmux ls | grep "^$base_session" | sed "s/^\($base_session[^:]*\): .*$/\1/"`)
+        base_session_full=$(trim `tmux list-sessions -F '#{session_name}' | grep "^$base_session" | sed "s/^\($base_session[^:]*\): .*$/\1/"`)
 
         echo "Launching copy of base session $base_session_full ..."
 
         # Find a session prefix number that hasn't already been used
         num_prefix=1
-        while [[ $(trim `tmux ls | grep -P "^$num_prefix,$base_session_full" | wc -l`) -gt 0 ]];
+        while [[ $(trim `tmux ls | grep "^$num_prefix,$base_session_full" | wc -l`) -gt 0 ]];
         do
             num_prefix=`expr $num_prefix + 1`
         done
