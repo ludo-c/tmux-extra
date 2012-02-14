@@ -47,7 +47,7 @@ else
 
         # Find a session prefix number that hasn't already been used
         num_prefix=1
-        while [[ $(trim `tmux ls | grep "^$num_prefix,$base_session_full" | wc -l`) -gt 0 ]];
+        while [[ $(trim `tmux list-sessions -F '#{session_name}' | grep "^$num_prefix,$base_session_full" | wc -l`) -gt 0 ]];
         do
             num_prefix=`expr $num_prefix + 1`
         done
