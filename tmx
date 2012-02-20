@@ -14,6 +14,27 @@
 # passing arguments
 trim() { echo $1; }
 
+#TMUX_SUPPORTS_MINUS_F=$(tmux list-sessions -F '#{session_name}' > /dev/null 2>&1 && echo 0 || echo 1)
+#...but that hangs due to epoll problems -- see
+# https://sourceforge.net/tracker/?func=detail&atid=973262&aid=3489496&group_id=200378
+TMUX_SUPPORTS_MINUS_F=0
+
+tmux-list-sessions() {
+    if [[ "$TMUX_SUPPORTS_MINUS_F" == 0 ]] ; then
+        tmux list-sessions -F '#{session_name}'
+    else
+        tmux list-sessions | cut -d: -f 1
+    fi
+}
+
+tmux-list-old-sessions() {
+    if [[ "$TMUX_SUPPORTS_MINUS_F" == 0 ]] ; then
+        tmux list-sessions -F '#{?session_attached,,#{?session_grouped,,#{session_name}}}'
+    else
+        tmux list-sessions 2>/dev/null | grep -v '(group [[:digit:]]\+)' | grep -v '(attached)' | cut -d: -f 1
+    fi
+}
+
 if [[ -z "$1" ]]; then
     echo "Specify session name as the first argument"
     exit
@@ -27,7 +48,7 @@ fi
 
 base_session="$1"
 # This actually works without the trim() on all systems except OSX
-tmux_nb=$(trim `tmux list-sessions -F '#{session_name}' | grep -c "^$base_session$"`)
+tmux_nb=$(trim `tmux-list-sessions | grep -c "^$base_session$"`)
 if [[ "$tmux_nb" == "0" ]]; then
     echo "Launching tmux base session $base_session ..."
     tmux new-session -s $base_session
@@ -35,8 +56,7 @@ else
     # Make sure we are not already in a tmux session
     if [[ -z "$TMUX" ]]; then
         # Kill defunct sessions first
-        old_sessions=$(tmux list-sessions -F '#{?session_attached,,#{?session_grouped,,#{session_name}}}' 2>/dev/null)
-        for old_session_id in $old_sessions; do
+        for old_session_id in tmux-list-old-sessions ; do
             tmux kill-session -t $old_session_id
         done
 
