@@ -15,9 +15,9 @@
 trim() { echo $1; }
 
 #TMUX_SUPPORTS_MINUS_F=$(tmux list-sessions -F '#{session_name}' > /dev/null 2>&1 && echo 0 || echo 1)
-#...but that hangs due to epoll problems -- see
+#...but that hangs on Linux due to epoll problems -- see
 # https://sourceforge.net/tracker/?func=detail&atid=973262&aid=3489496&group_id=200378
-TMUX_SUPPORTS_MINUS_F=0
+TMUX_SUPPORTS_MINUS_F=1  #disable -F support
 
 tmux-list-sessions() {
     if [[ "$TMUX_SUPPORTS_MINUS_F" == 0 ]] ; then
