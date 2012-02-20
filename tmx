@@ -51,7 +51,19 @@ base_session="$1"
 tmux_nb=$(trim `tmux-list-sessions | grep -c "^$base_session$"`)
 if [[ "$tmux_nb" == "0" ]]; then
     echo "Launching tmux base session $base_session ..."
-    tmux new-session -s $base_session
+
+    # we separate 'new-session' and 'attach' to allow .tmux.conf
+    # commands to create the new session first with the right name
+    # (which is, after all, a simple convention so easily shared),
+    # which will (perversely) then cause this new-session command to
+    # exit with an error.  Despite this error, a new session with
+    # exactly that name has been created.  Then we can happily attach
+    # to it.  If .tmux.conf has no new-session command in it, our
+    # explicit 'new-session' creates it, and we attach happily, again,
+    # to it.
+    tmux new-session -d -s $base_session
+    tmux attach         -t $base_session
+
 else
     # Make sure we are not already in a tmux session
     if [[ -z "$TMUX" ]]; then
