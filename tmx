@@ -56,7 +56,7 @@ else
     # Make sure we are not already in a tmux session
     if [[ -z "$TMUX" ]]; then
         # Kill defunct sessions first
-        for old_session_id in tmux-list-old-sessions ; do
+        for old_session_id in `tmux-list-old-sessions` ; do
             tmux kill-session -t $old_session_id
         done
 
