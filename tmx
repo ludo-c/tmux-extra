@@ -10,7 +10,7 @@
 #     http://forums.gentoo.org/viewtopic-t-836006-start-0.html
 #
 
-# Works because bash automatically trims by assigning to variables and by 
+# Works because bash automatically trims by assigning to variables and by
 # passing arguments
 trim() { echo $1; }
 
