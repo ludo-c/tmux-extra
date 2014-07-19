@@ -74,10 +74,12 @@ if [[ "$tmux_nb" == "0" ]]; then
 else
     # Make sure we are not already in a tmux session
     if [[ -z "$TMUX" ]]; then
-        # Kill defunct sessions first
-        for old_session_id in `tmux-list-old-sessions` ; do
-            tmux kill-session -t $old_session_id
-        done
+        if [[ -z "$TMUX_PRESERVE_UNATTACHED_SESSIONS" ]] ; then
+            # Kill defunct sessions first
+            for old_session_id in `tmux-list-old-sessions` ; do
+                tmux kill-session -t $old_session_id
+            done
+        fi
 
         echo "Launching copy of base session $base_session ..."
 
