@@ -17,7 +17,7 @@ else
   TMUX_CMD="tmux"
 fi
 
-# Works because bash automatically trims by assigning to variables and by 
+# Works because bash automatically trims by assigning to variables and by
 # passing arguments
 trim() { echo $1; }
 
@@ -51,6 +51,10 @@ fi
 if [[ "$1" == "ls" ]]; then
     tmux ls
     exit
+fi
+
+if [[ -z "$2" ]]; then
+    new_window="\\; new-window"
 fi
 
 base_session="$1"
@@ -94,7 +98,7 @@ else
         # to share windows
         tmux new-session -d -t $base_session -s $session_id
         # Attach to the new session
-        $TMUX_CMD attach-session -t $session_id
+        eval $TMUX_CMD attach-session -t $session_id $new_window
         # When we detach from it, kill the session
         $TMUX_CMD kill-session -t $session_id
     fi
